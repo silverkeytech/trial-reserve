@@ -1,0 +1,22 @@
+﻿@page "/reschedule-notification/{id}"
+@model Reserve.Pages.Appointment.AppointmentRescheduleNotificationModel
+@using Microsoft.Extensions.Localization
+@using Reserve.Core.Features.Appointment
+@inject IStringLocalizer<AppointmentLocalization> L
+<div class="container mt-5">
+    <h1 class="display-4 text-center">@L["appointment-rescheduling-successful"]</h1>
+
+    <div class="d-flex justify-content-center">
+        <div class="card border rounded mt-4 col-8">
+            <div class="card-body text-center">
+                <p class="card-text" style="font-size: 1.25rem;">
+                    @L["reschedule-message"]
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="@Url.Page("UserAppointmentDashboard", new { id = Model.Id })" class="reserve-blue-button btn btn-custom">@L["back-to-dashboard"]</a>
+    </div>
+</div>

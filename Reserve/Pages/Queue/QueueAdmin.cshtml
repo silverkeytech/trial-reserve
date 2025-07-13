@@ -1,0 +1,176 @@
+﻿@page "/q-admin/{id}"
+@model Reserve.Pages.Queue.QueueAdminModel
+@Html.AntiForgeryToken()
+@using Microsoft.Extensions.Localization
+@using Reserve.Core.Features.Queue
+@using Reserve.Core
+@inject IStringLocalizer<QueueLocalization> qL
+@inject IStringLocalizer<Global> gL
+<div class="container mt-5">
+    <h1 class="display-4 text-center">@qL["attendees-list-title"]</h1>
+    <div class="modal fade" id="resetQueueModal" tabindex="-1" aria-labelledby="resetQueueModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="modal-header border-0">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="d-flex flex-column align-items-center m-3">
+                        <h1 class="modal-title fs-5 notification-title d-flex justify-content-center m-3" id="resetQueueModalLabel">@qL["reset-queue-modal-title"]</h1>
+                        <div class="notification-border d-flex justify-content-center">
+                            <p class="notification-text p-3">@qL["reset-queue-modal-text"]</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-around border-0">
+                        <button class="reserve-blue-button btn" data-bs-toggle="modal" data-bs-target="#resetQueueModal" onclick="resetQueue(event)">@qL["reset-button"]</button>
+                        <button type="button" data-bs-dismiss="modal" class="btn reserve-blue-button">@gL["no"]</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="resetSuccessModal" tabindex="-1" aria-labelledby="resetSuccessModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="d-flex flex-column align-items-center m-3">
+                    <h1 class="modal-title fs-5 notification-title d-flex justify-content-center m-3" id="resetSuccessModalLabel">@qL["reset-success-modal-title"]</h1>
+                    <div class="notification-border d-flex justify-content-center">
+                        <p class="notification-text p-3">@qL["reset-success-modal-text"]</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="d-flex flex-column align-items-center m-3">
+                    <h1 class="modal-title fs-5 notification-title d-flex justify-content-center m-3" id="confirmationModalLabel">@qL["confirmation-modal-title"]</h1>
+                    <div class="notification-border d-flex justify-content-center">
+                        <p class="notification-text p-3">@qL["confirmation-modal-text"]</p>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-around border-0">
+                    <button id="confirmMarkAsReserved" type="button" class="reserve-blue-button btn">@gL["yes"]</button>
+                    <button type="button" data-bs-dismiss="modal" class="btn reserve-blue-button">@gL["no"]</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between mt-4">
+        <div>
+            <h2>@qL["organization-customer-service-queue"]</h2>
+            <p class="text-muted">@qL["last-reset"] @Model.LastReset </p>
+        </div>
+        <div>
+            <button class="reserve-blue-button btn" data-bs-toggle="modal" data-bs-target="#resetQueueModal">@qL["reset-button"]</button>
+        </div>
+    </div>
+
+    <table class="table table-striped mt-4" id="attendeesTable">
+        <thead>
+            <tr>
+                <th>@qL["queue-number-header"]</th>
+                <th>@gL["name"]</th>
+                <th>@gL["phone-number"]</th>
+                <th>@qL["action-header"]</th>
+            </tr>
+        </thead>
+        <tbody hx-get="/q-admin/@Model.Id.ToString()?handler=FetchNewData&Id=@Model.Id.ToString()"
+               hx-trigger="every 5s"
+               hx-target="this"
+               hx-swap="innerHTML">
+            @foreach (var attendee in Model.Attendees)
+            {
+                <tr class="notification-text box-shadow shadow-sm">
+                    <td>@attendee?.QueueNumber</td>
+                    <td>@attendee?.CustomerName</td>
+                    <td>@attendee?.CustomerPhoneNumber</td>
+                    <td>
+                        <form method="post" id="markAsReservedForm-@attendee?.QueueNumber">
+                            <input type="hidden" asp-for="Id" />
+                            <input type="hidden" asp-for="@attendee!.QueueNumber" name="queueNumber" />
+                            <button type="button" class="btn reserve-blue-button" onclick="confirmMarkAsReserved(@attendee?.QueueNumber)">@qL["mark-as-reserved-button"]</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function markAsReserved(queueNumber) {
+        $.ajax({
+            url: "/q-admin/${@Model.Id}?handler=MarkAsReserved",
+            type: "POST",
+            data: {
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+                Id: "@Model.Id",
+                queueNumber: queueNumber
+            },
+            success: function (result) {
+                if (result.success) {
+                    console.log(result.html);
+                    $("tbody").html(result.html);
+                } else {
+                    console.error("Failed to mark attendee as reserved. Error message: " + result.error); // Log the error message
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.error("AJAX request failed.");
+                console.error("Status: " + textStatus);
+                console.error("Error: " + errorThrown);
+                console.error("Response Text: " + xhr.responseText);
+            }
+        });
+    }
+
+
+    function confirmMarkAsReserved(queueNumber) {
+        $('#confirmationModal').modal('show');
+        console.log("HELP");
+        $('#confirmMarkAsReserved').click(function () {
+            markAsReserved(queueNumber);
+            $('#confirmationModal').modal('hide');
+        });
+    }
+
+
+    function resetQueue(event) {
+        event.preventDefault();
+        $.ajax({
+            url: "/q-admin/${@Model.Id}?handler=Reset",
+            type: "POST",
+            data: {
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+                Id: "@Model.Id"
+            },
+            success: function (result) {
+                if (result.success) {
+                    console.log(result.html);
+                    $('#resetSuccessModal').modal('show');
+                    $("tbody").html(result.html);
+                } else {
+                    console.error("Failed to reset the queue.");
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.error("AJAX request failed.");
+                console.error("Status: " + textStatus);
+                console.error("Error: " + errorThrown);
+                console.error("Response Text: " + xhr.responseText);
+            }
+        });
+    }
+</script>

@@ -1,0 +1,61 @@
+﻿@page "/validation/email"
+@model Reserve.Pages.Validation.EmailValidationModel
+@using Microsoft.Extensions.Localization
+@using Reserve.Core.Features.Queue
+@using Reserve.Core
+@inject IStringLocalizer<QueueLocalization> qL
+@inject IStringLocalizer<Global> gL
+
+<h1 class="display-4 text-center">Validate Email Service</h1>
+<div class="create-calendar-form col-md-12 d-flex flex-column align-items-center mt-3">
+    <div class="notification-border col-md-12 mb-lg-5">
+        <form id="emailForm" method="post" class="p-3">
+            <div class="d-flex flex-column">
+                <div class="d-flex appointer-details justify-content-evenly">
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <label asp-for="Email" class="form-label">Email Address</label>
+                    </div>
+                    <input type="text" asp-for="Email" class="form-control w-50 input-appointer-details" placeholder="Enter email address" />
+                </div>
+                <span asp-validation-for="Email" class="text-danger d-flex justify-content-center p-3"></span>
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-custom reserve-blue-button">Send email</button>
+            </div>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        </form>
+        <div id="successMessage" class="text-success mt-3" style="display: none; text-align: center; font-size: 1.2em; font-weight: bold;">Email sent successfully!</div>
+        <div id="errorMessage" class="text-danger mt-3" style="display: none; text-align: center; font-size: 1.2em; font-weight: bold;">An error occurred while sending the email.</div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#emailForm').submit(function (event) {
+                event.preventDefault();
+
+                $.ajax({
+                    url: '/validation/email',
+                    type: 'post',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            $('#successMessage').show();
+                            $('#errorMessage').hide();
+                        } else {
+                            $('#successMessage').hide();
+                            $('#errorMessage').show();
+                        }
+                    },
+                    error: function () {
+                        $('#successMessage').hide();
+                        $('#errorMessage').show();
+                    }
+                });
+            });
+        });
+    </script>
+}

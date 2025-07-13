@@ -1,0 +1,225 @@
+@import url('https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200;0,400;0,500;1,200;1,300;1,400;1,500;1,600&family=Oswald&family=Poppins:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Rancho&family=Source+Sans+3:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200;0,400;0,500;1,200;1,300;1,400;1,500;1,600&family=Oswald&family=Poppins:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Rancho&display=swap');
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.reserve-blue-button {
+    color: #ffffff !important;
+    background-color: #06adef;
+    font-size: 0.9rem;
+    border-radius: 40px;
+    font-family: 'Source Sans 3', sans-serif;
+}
+
+.reserve-blue-button:hover {
+    background-color: #20a3d7;
+}
+
+.reserve-red-button {
+    color: #ffffff !important;
+    background-color: #ff3259;
+    font-size: 0.9rem;
+    border-radius: 40px;
+    font-family: 'Source Sans 3', sans-serif;
+}
+
+.reserve-red-button:hover {
+    background-color: #fa1414;
+}
+
+.body-font{
+    font-family: 'Mulish', sans-serif;
+}
+
+.subtitle-font{
+    font-family: 'Source Sans 3', sans-serif;
+    font: 700;
+}
+
+.notification-title{
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 2rem;
+    display:flex;
+    justify-content: center;
+}
+
+.notification-text {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 1.2em;
+}
+
+
+
+.notification-border {
+    border: 1px solid #d7dfef;
+    border-radius: 30px;
+    padding-left: 10px!important;
+    padding-right: 10px!important;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    width:60%;
+}
+
+.page-title {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 1.75rem;
+    display: flex;
+    justify-content: center;
+}
+
+@media (max-width: 980px) {
+    .notification-title {
+        font-size: 1.4rem;
+    }
+    .dashboard{
+        display:flex;
+        flex-direction: column!important;
+    }
+    .dashboard-items{
+        margin-bottom: 20px!important;
+        width:100%!important;
+    }
+    .attendees-button {
+        height: 150px!important;
+    }
+}
+
+@media (max-width:760px){
+    .appointer-details{
+        display:flex;
+        flex-direction: column!important;
+    }
+    .input-appointer-details{
+        width:100%!important;
+    }
+    .edit-slots{
+        display:flex;
+        flex-direction: column!important;
+    }
+    .date-edit-slots{
+        width:100%!important;
+    }
+}
+
+@media (max-width:600px){
+    .create-calendar {
+        margin-bottom: 30px !important;
+        display: flex;
+        flex-direction:column!important;
+    }
+    .create-calendar-slots{
+        width:100%!important;
+        margin:20px;
+    }
+    .calendar-notification{
+        font-size:0.9rem!important;
+    }
+}
+
+.find-event-image{
+    width:50%;
+}
+
+.find-event-text {
+    font-family: 'Mulish', sans-serif;
+    font-size: 0.9rem;
+}
+
+.card-find-event-date {
+    color: #06adef;
+    font-family: 'Mulish', sans-serif;
+    font-size:0.8rem;
+    font-weight:700!important;
+}
+
+.card-find-event-location{
+    font-family: 'Mulish', sans-serif;
+    font-size: 0.7rem;
+}
+
+.card-find-event-background {
+    width:100%!important;
+    padding:0!important;
+    margin:0!important;
+}
+
+.card-find-event:hover {
+    box-shadow: 0 5px 25px rgba(1 1 1 / 15%);
+    transition: 0.7s ease;
+}
+.card-find-event:hover img{
+    opacity:0.9;
+}
+.card-img-top{
+    border-radius: 30px 30px 0 0;
+}
+.card{
+    border:0;
+}
+
+.card-title:hover{
+    text-decoration:underline;
+    color:#212529;
+    font-weight:500;
+}
+
+.card-title{
+    color:#212529;
+    text-decoration:none;
+    font-size:1.5rem;
+    font-weight:500;
+}
+
+@media (max-width:500px){
+    .find-event-top{
+        display:flex;
+        flex-direction:column!important;
+        align-items:center!important;
+    }
+    .find-event-image{
+        margin-top:30px;
+    }
+    .create-calendar-form{
+        width:100%!important;
+        margin:0;
+    }
+    .notification-border{
+        width:100%!important;
+    }
+}
+
+.reserve-appointment{
+    font-family: 'Mulish', sans-serif;
+    font-size: 0.9rem;
+}
+
+.font-appointment-details {
+    font-family: 'Mulish', sans-serif;
+    font-size: 1.9rem;
+}
+
+
+
+
+
+

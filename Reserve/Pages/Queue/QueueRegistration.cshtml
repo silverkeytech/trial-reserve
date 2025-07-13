@@ -1,0 +1,68 @@
+﻿@page "/q-reg/{id}"
+@model Reserve.Pages.Queue.QueueRegistrationModel
+@using Microsoft.Extensions.Localization
+@using Reserve.Core
+@inject IStringLocalizer<Global> gL
+@using Reserve.Core.Features.Queue
+@inject IStringLocalizer<QueueLocalization> qL
+
+<h1 class="display-4 text-center">@qL["welcome-to-queue", Model.QueueEvent!.Title!]</h1>
+<div class="container mt-5 col-6">
+    <div class="card border rounded mt-2">
+        <div class="card-header">
+            <p class="text-muted" style="font-size: 1.125rem; display: inline-block;">@qL["current-queue-number", Model.NextQueueNumber]</p>
+            <p class="text-muted" style="font-size: 1.125rem; float: right; display: inline-block;">@qL["current-number-served", Model.QueueEvent.CurrentNumberServed]</p>
+        </div>
+        <div class="card-body">
+            <p class="card-text text-center"><b>@qL["queue-up-page-welcome", Model.QueueEvent.Title!]</b></p>
+            <p class="card-text text-center">@qL["queue-up-instruction"]</p>
+            <form method="post" onsubmit="onSubmit(event)">
+                <input type="hidden" asp-for="QueueEventId" />
+                <input type="hidden" asp-for="FcmToken" id="fcmToken" name="FcmToken" />
+
+                <div class="mb-3">
+                    <label for="CustomerName" class="form-label">@gL["name"]</label>
+                    <input type="text" class="form-control" name="NewQueueTicket.CustomerName" asp-for="NewQueueTicket!.CustomerName" placeholder="@gL["enter-your-name"]" />
+                    <span asp-validation-for="NewQueueTicket!.CustomerName" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label for="CustomerPhoneNumber" class="form-label">@gL["phone-number"]</label>
+                    <input type="text" class="form-control" name="NewQueueTicket.CustomerPhoneNumber" asp-for="NewQueueTicket!.CustomerPhoneNumber" id="phoneNumberInput" placeholder="@gL["enter-phone-number"]" />
+                    <span asp-validation-for="NewQueueTicket!.CustomerPhoneNumber" class="text-danger"></span>
+                </div>
+                <input type="hidden" asp-for="ReCaptchaToken" id="recaptchaTokenInputId" />
+                <div class="d-flex justify-content-center mt-3">
+                    <div id="html_element"></div>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <span asp-validation-for="ReCaptchaToken" class="text-danger text-center"></span>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="reserve-blue-button btn">@qL["queue-up-button"]</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        document.getElementById('phoneNumberInput').addEventListener('input', function (e) {
+            var value = e.target.value;
+            e.target.value = value.replace(/[^0-9+]/g, '');
+        });
+
+        var onloadCallback = function () {
+            grecaptcha.render('html_element', {
+                'sitekey': '@Model.ReCaptchaSiteKey'
+            });
+        };
+
+        function onSubmit(e) {
+            e.preventDefault();
+            var token = grecaptcha.getResponse();
+            document.getElementById('recaptchaTokenInputId').value = token;
+            e.target.submit();
+        }
+    </script>
+}

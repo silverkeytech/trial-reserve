@@ -1,0 +1,101 @@
+﻿@page "/create-event"
+@model Reserve.Pages.Event.CreateEventModel
+@using Microsoft.Extensions.Localization
+@using Reserve.Core.Features.Event
+@using Reserve.Core
+@inject IStringLocalizer<EventLocalization> eL
+@inject IStringLocalizer<Global> gL
+
+@{
+    string minStartDate = DateTime.Now.AddHours(1).ToString("yyyy-MM-ddTHH:mm");
+    string minEndDate = DateTime.Now.AddHours(1).ToString("yyyy-MM-ddTHH:mm");
+}
+
+<h1 class="event-title text-center">@eL["create-event"]</h1>
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="container mt-4 mb-4 p-3 border rounded">
+    <form method="post" onsubmit="onSubmit(event)" enctype="multipart/form-data">
+        <div class="title-icon mb-3 subtitle-font">
+            <svg class="svg-creation" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
+                <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" />
+            </svg>
+            <h2>@eL["basic-info"]</h2>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" asp-for="NewEvent!.Title">@eL["event-title-label"]</label>
+            <input class="form-control" type="text" asp-for="NewEvent!.Title" name="NewEvent.Title" placeholder="@eL["event-title-placeholder"]" />
+            <span asp-validation-for="NewEvent!.Title" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" asp-for="NewEvent!.OrganizerName">@eL["organizer-name-label"]</label>
+            <input class="form-control" type="text" asp-for="NewEvent!.OrganizerName" name="NewEvent.OrganizerName" placeholder="@eL["organizer-name-placeholder"]" />
+            <span asp-validation-for="NewEvent!.OrganizerName" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" asp-for="NewEvent!.OrganizerEmail">@eL["organizer-email-label"]</label>
+            <input class="form-control" asp-for="NewEvent!.OrganizerEmail" name="NewEvent.OrganizerEmail" type="text" placeholder="@eL["organizer-email-placeholder"]" />
+            <span asp-validation-for="NewEvent!.OrganizerEmail" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" asp-for="NewEvent!.Description">@eL["description-label"]</label>
+            <textarea class="form-control" asp-for="NewEvent!.Description" name="NewEvent.Description" placeholder="@eL["description-placeholder"]"></textarea>
+            <span asp-validation-for="NewEvent!.Description" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" asp-for="NewEvent!.MaximumCapacity">@eL["maximum-capacity-label"]</label>
+            <input class="form-control" asp-for="NewEvent!.MaximumCapacity" name="NewEvent.MaximumCapacity" type="number" placeholder="@eL["maximum-capacity-placeholder"]" />
+            <span asp-validation-for="NewEvent!.MaximumCapacity" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" asp-for="NewEvent!.Location">@eL["location-label"]</label>
+            <input class="form-control" asp-for="NewEvent!.Location" name="NewEvent.Location" type="text" placeholder="@eL["location-placeholder"]" />
+            <span asp-validation-for="NewEvent!.Location" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="ImageUrl">@eL["image-url-label"]</label>
+            <input class="form-control" name="ImageUrl" type="file" placeholder="@eL["image-url-label"]" />
+            <span asp-validation-for="NewEvent!.ImageUrl" class="text-danger"></span>
+        </div>
+        <div class="title-icon mt-3 mb-3 subtitle-font">
+            <svg class="svg-creation" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar" viewBox="0 0 16 16">
+                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z" />
+            </svg>
+            <h2>@eL["date-and-time"]</h2>
+        </div>
+        <div class="row">
+            <div class="col-sm-6 mb-3">
+                <label class="form-label" asp-for="NewEvent!.StartDate">@eL["event-starts-label"]</label>
+                <input class="form-control" asp-for="NewEvent!.StartDate" name="NewEvent.StartDate" min="@minStartDate" type="datetime-local" />
+                <span asp-validation-for="NewEvent!.StartDate" class="text-danger"></span>
+            </div>
+            <div class="col-sm-6 mb-3">
+                <label class="form-label" asp-for="NewEvent!.EndDate">@eL["event-ends-label"]</label>
+                <input class="form-control" asp-for="NewEvent!.EndDate" name="NewEvent.EndDate" min="@minEndDate" type="datetime-local" />
+                <span asp-validation-for="NewEvent!.EndDate" class="text-danger"></span>
+            </div>
+        </div>
+        <input type="hidden" asp-for="ReCaptchaToken" id="recaptchaTokenInputId" />
+        <div class="d-flex justify-content-center mt-3">
+            <div id="html_element"></div>
+        </div>
+        <div class="d-flex justify-content-center">
+            <span asp-validation-for="ReCaptchaToken" class="text-danger text-center"></span>
+        </div>
+        <div class="d-flex justify-content-center mt-3">
+            <button class="reserve-blue-button btn btn-custom" type="submit">@eL["create-event-button"]</button>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    var onloadCallback = function () {
+        grecaptcha.render('html_element', {
+            'sitekey': '@Model.ReCaptchaSiteKey'
+        });
+    };
+    function onSubmit(e) {
+        e.preventDefault();
+        var token = grecaptcha.getResponse();
+        document.getElementById('recaptchaTokenInputId').value = token;
+        e.target.submit();
+    }
+</script>

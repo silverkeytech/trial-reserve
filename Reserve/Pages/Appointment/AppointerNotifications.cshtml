@@ -1,0 +1,77 @@
+﻿@page "/appointer-notification/{id}"
+@model Reserve.Pages.Appointment.AppointerNotificationsModel
+@using Microsoft.Extensions.Localization
+@using Reserve.Core.Features.Appointment
+@inject IStringLocalizer<AppointmentLocalization> L
+@Html.AntiForgeryToken()
+<style>
+    tr.htmx-swapping td {
+        opacity: 0;
+        transition: opacity 1s ease-out;
+    }
+</style>
+
+<h1 class="notification-title mb-lg-5">@L["notification-title"]</h1>
+
+@if (Model.AppointerNotifications.Count > 0)
+{
+    <div class="table-responsive mb-5">
+        <table class="table mb-lg-5">
+            <thead class="table-light">
+                <tr>
+                    <th>@L["name"]</th>
+                    <th>@L["phone-number"]</th>
+                    <th>@L["email"]</th>
+                    <th>@L["date-and-time"]</th>
+                    <th>@L["notification-type"]</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                @foreach (var appointment in Model.AppointerNotifications)
+            {
+                <tr>
+                        <td>@appointment?.ReserverName</td>
+                        <td>@appointment?.ReserverPhoneNumber</td>
+                        <td>@appointment?.ReserverEmail</td>
+                        <td>@appointment?.Slot?.StartTime.ToLongDateString() @appointment?.Slot?.StartTime.ToShortTimeString()</td>
+                        <td>@appointment?.NotificationType</td>
+                        <td><button hx-delete="/delete-notification/@appointment?.Id" hx-headers='js:{"X-CSRF-TOKEN": document.getElementsByName("__RequestVerificationToken")[0].value}' hx-target="closest tr" hx-swap="outerHTML swap:1s" class="btn reserve-red-button">@L["dismiss-notification"]</button></td>
+                    </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}
+
+@if (Model.RescheduleRequests.Count > 0)
+{
+    <div class="table-responsive">
+        <table class="table">
+            <thead class="table-light">
+                <tr>
+                    <th>@L["name"]</th>
+                    <th>@L["phone-number"]</th>
+                    <th>@L["email"]</th>
+                    <th>@L["old-slot-date"]</th>
+                    <th>@L["new-slot-date"]</th>
+                    <th>@L["rescheduling-status"]</th>
+                </tr>
+            </thead>
+            <tbody id="table-request-body">
+                @foreach (var reschedule in Model.RescheduleRequests)
+            {
+                <tr>
+                        <td>@reschedule?.OriginalAppointment.ReserverName</td>
+                        <td>@reschedule?.OriginalAppointment.ReserverPhoneNumber</td>
+                        <td>@reschedule?.OriginalAppointment.ReserverEmail</td>
+                        <td>@reschedule?.OriginalAppointment.Slot?.StartTime.ToShortDateString() - @reschedule?.OriginalAppointment.Slot?.StartTime.ToShortTimeString()</td>
+                        <td>@reschedule?.RequestedTime.StartTime.ToShortDateString() - @reschedule?.RequestedTime.StartTime.ToShortTimeString()</td>
+                        <td>@reschedule?.RescheduleStatus</td>
+                        <td><button hx-delete="/delete-request/@reschedule?.Id" hx-headers='js:{"X-CSRF-TOKEN": document.getElementsByName("__RequestVerificationToken")[0].value}' hx-target="closest tr" hx-swap="outerHTML swap:1s" class="btn reserve-red-button">@L["delete-request"]</button></td>
+                    </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}

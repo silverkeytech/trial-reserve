@@ -1,0 +1,36 @@
+﻿@page "/event-created/{id}"
+@model Reserve.Pages.Event.CreationNotificationModel
+@using Microsoft.Extensions.Localization
+@using Reserve.Core.Features.Event
+@using Reserve.Core
+@inject IStringLocalizer<EventLocalization> eL
+@inject IStringLocalizer<Global> gL
+<h1 class="notification-title mb-lg-5">@eL["notification-title"]</h1>
+<div class="d-flex flex-column justify-content-center align-items-center">
+    <div class="notification-border mb-lg-5 text-center">
+        <div>
+            <p class="notification-text d-flex justify-content-center mb-1">
+                @eL["event-share-message"]
+            </p>
+            <p class="notification-text d-flex justify-content-center mb-1">
+                 <a href="@Url.Page("EventDetails", new {id = Model.Id})"> www.reserve.com/event-details/@Model.Id</a>
+            </p>
+        </div>
+        <div>
+            <div>
+                <p class="notification-text d-flex justify-content-center mb-1">
+                    @eL["event-edit-message"]
+                </p>
+                    <p class="notification-text d-flex justify-content-center mb-1">
+                    <a href="@Url.Page("ViewAttendees", new {id = Model.Id})"> www.reserve.com/attendees/@Model.Id</a>
+                </p>
+                <p class="card-text mb-2" style="font-size: 1.25rem;">@gL["email-sent"]</p>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center">
+        <a href="@Url.Page("ViewAttendees", new {id = Model.Id})" class="btn btn-custom reserve-blue-button">
+            @eL["view-edit-event-button"]
+        </a>
+    </div>
+</div>

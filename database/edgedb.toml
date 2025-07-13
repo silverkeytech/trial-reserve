@@ -1,0 +1,6 @@
+[edgedb]
+server-version = "3.2"
+
+[project]
+connection = "reserve"
+

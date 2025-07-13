@@ -1,0 +1,250 @@
+﻿@page "/upcoming-appointments/{id}"
+@model Reserve.Pages.Appointment.UpcomingAppointmentsModel
+@using Microsoft.Extensions.Localization
+@using Reserve.Core.Features.Appointment
+@using Reserve.Core
+@inject IStringLocalizer<AppointmentLocalization> aL
+@inject IStringLocalizer<Global> gL
+@Html.AntiForgeryToken()
+
+<style>
+    tr.htmx-swapping td {
+        opacity: 0;
+        transition: opacity 1s ease-out;
+    }
+    a{
+        color:#000000;
+        text-decoration: none;
+    }
+
+    .fc .fc-button-primary {
+        color: #FFFFFF;
+        background-color: #06adef !important;
+        border-color: #FFFFFF !important;
+    }
+
+    .fc .fc-button-primary:hover {
+        color: #FFFFFF;
+        background-color: #20a3d7 !important;
+        border-color: #FFFFFF !important;
+    }
+</style>
+<script src='https://fastly.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
+
+
+@if(TempData["error"] != null)
+{
+    <script type="text/javascript">
+        toastr.options.closeButton = true;
+        toastr.error('@TempData["error"]');
+    </script>
+}
+
+@if (TempData["success"] != null)
+{
+    <script type="text/javascript">
+        toastr.options.closeButton = true;
+        toastr.info('@TempData["success"]');
+    </script>
+}
+
+<h1 class="notification-title mb-lg-5">@aL["upcoming-appointments"]</h1>
+<div class="d-flex flex-lg-row edit-slots justify-content-between mb-5">
+    <h2 class="notification-title">@aL["add-new-slot"]</h2>
+    <form class="d-flex flex-column justify-content-between">
+        <div class="d-flex justify-content-between edit-slots col-md-12">
+            <div class="d-flex align-items-center">
+                <label asp-for="NewAvailabilitySlot!.StartTime" class="form-label mb-3">@gL["from"] </label>
+            </div>
+            <input asp-for="NewAvailabilitySlot!.StartTime" type="datetime-local" name="StartTime" id="NewAvailabilitySlot_StartTime" class="mb-3 date-edit-slots form-control w-25" />
+            <div class="d-flex align-items-center">
+                <label asp-for="NewAvailabilitySlot!.EndTime" class="form-label mb-3">@gL["to"] </label>
+            </div>
+            <input asp-for="NewAvailabilitySlot!.EndTime" type="datetime-local" name="EndTime" id="NewAvailabilitySlot_EndTime" class="mb-3 date-edit-slots form-control w-25" />
+            <button type="submit" style="height:40px!important;" class="btn reserve-blue-button mb-3" id="Add">@gL["add"]</button>
+        </div>
+        <div class="d-flex text-danger justify-content-center" id="error-message"></div>
+    </form>
+    <a href="@Url.Page("AppointerNotifications", new {id = Model.Id})" style="height:40px!important" class="btn reserve-blue-button d-flex align-items-center justify-content-center">@gL["view-notifications"]</a>
+    <span class="text-danger" id="errorSpan" data-start-time-required="@gL["start-time-required"]" data-end-time-after-start-time="@gL["end-time-after-start-time"]"
+          data-future-start-time="@gL["future-start-time"]" data-slot-added-success="@gL["slot-added-success"]" data-free-slot="@aL["free-slot"]" slot-error="@gL["slot-error"]" pending-slot="@aL["pending-slot"]"></span>
+</div>
+
+<div id='calendar'></div>
+
+<script>
+    let calendar;
+    function validateForm() {
+        var startTimeInput = document.getElementById("NewAvailabilitySlot_StartTime");
+        var endTimeInput = document.getElementById("NewAvailabilitySlot_EndTime");
+        var errorMessage = document.getElementById("error-message");
+        var errorSpan = document.getElementById("errorSpan");
+        var freeSlotText = errorSpan.getAttribute('data-free-slot');
+        var pendingSlotText = errorSpan.getAttribute('pending-slot');
+        var startTime = new Date(startTimeInput.value);
+        var endTime = new Date(endTimeInput.value);
+
+        if (!startTimeInput.value || !endTimeInput.value) {
+            errorMessage.innerText = errorSpan.getAttribute('data-start-time-required');
+            return false;
+        }
+        if (endTime <= startTime) {
+            errorMessage.innerText = errorSpan.getAttribute('data-end-time-after-start-time');
+            return false;
+        }
+        if (startTime < new Date()) {
+            errorMessage.innerText = errorSpan.getAttribute('data-future-start-time');
+            return false;
+        }
+        errorMessage.innerText = "";
+        return true;
+    }
+
+    document.addEventListener('DOMContentLoaded', async function () {
+        var errorSpan = document.getElementById("errorSpan");
+        var freeSlotText = errorSpan.getAttribute('data-free-slot');
+        var pendingSlotText = errorSpan.getAttribute('pending-slot');
+        let appointmentsArg = [];
+        var response = await fetch("/get-appointments/@Model.Id");
+        if (response.status === 200) {
+            var data = await response.json();
+            data.forEach(appointment => {
+                appointmentsArg.push({
+                    id: appointment.id,
+                    title: appointment.reserverName, 
+                    start: appointment.slot.startTime, 
+                    end: appointment.slot.endTime,
+                    phoneNumber: appointment.reserverPhoneNumber,
+                    backgroundColor: "#ff3259",
+                    textColor: "#ffffff",
+                    borderColor: "#ff3259",
+                    url: "/user-details/" + appointment.id
+                });
+            });
+        } else {
+            console.error(`API request failed with status code: ${response.status}`);
+        }
+
+        var freeSlots = await fetch("/free-slots/@Model.Id");
+        if (freeSlots.status === 200) {
+            var data = await freeSlots.json();
+            data.forEach(slot => {
+                appointmentsArg.push({
+                    id: slot.id,
+                    title: freeSlotText,
+                    start: slot.startTime, 
+                    end: slot.endTime,
+                    backgroundColor: "#06adef",
+                    textColor: "#ffffff",
+                    borderColor: "#06adef",
+                    url: "/free-slot-details/" + slot.id
+                });
+            });
+        } else {
+            console.error(`API request failed with status code: ${freeSlots.status}`);
+        }
+
+        var pendingSlots = await fetch("/get-pending-slots/@Model.Id");
+        if(pendingSlots.status === 200) {
+            var data = await pendingSlots.json();
+            data.forEach(slot => {
+                appointmentsArg.push({
+                    id: slot.id,
+                    title: pendingSlotText, 
+                    start: slot.startTime, 
+                    end: slot.endTime,
+                    backgroundColor: "#febe00",
+                    textColor: "#ffffff",
+                    borderColor: "#febe00"
+                });
+            });
+        } else {
+            console.error(`API request failed with status code: ${pendingSlots.status}`);
+        }
+
+        var doneSlots = await fetch("/get-done-appointments/@Model.Id");
+        if (doneSlots.status === 200) {
+            var data = await doneSlots.json();
+            console.log(data);
+            data.forEach(appointment => {
+                appointmentsArg.push({
+                    id: appointment.id,
+                    title: appointment.reserverName,
+                    start: appointment.slot.startTime,
+                    end: appointment.slot.endTime,
+                    backgroundColor: "#006400",
+                    textColor: "#ffffff",
+                    borderColor: "#006400",
+                    url: "/user-details/" + appointment.id
+                });
+            });
+        } else {
+            console.error(`API request failed with status code: ${doneSlots.status}`);
+        }
+
+        var calendarEl = document.getElementById('calendar');
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            height: "auto",
+            themeSystem: 'bootstrap5',
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            events: appointmentsArg
+        });
+        calendar.render();
+    });
+    var startTimeInput = document.getElementById("NewAvailabilitySlot_StartTime");
+    var endTimeInput = document.getElementById("NewAvailabilitySlot_EndTime");
+    var form = document.querySelector("form");
+    var addButton = document.getElementById("Add");
+    var errorSpan = document.getElementById("errorSpan");
+    var freeSlotText = errorSpan.getAttribute('data-free-slot');
+    form.addEventListener("submit", async function (event) {
+        if (!validateForm()) {
+            event.preventDefault();
+        } else {
+            event.preventDefault();
+            var startTime = new Date(startTimeInput.value).toISOString();
+            var endTime = new Date(endTimeInput.value).toISOString();
+            var data = {
+                startTime: startTime,
+                endTime: endTime,
+                available: true
+            };
+            var response = await fetch("/add-slot/@Model.Id", {
+                method: "POST",
+                headers: {
+                    'Accept' : 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('[name="__RequestVerificationToken"]').value,
+                },
+                body: JSON.stringify(data)
+            });
+            if (response.status === 200) {
+                var data = await response.json();
+                var event = {
+                    id: data.id,
+                    title: freeSlotText,
+                    start: data.startTime,
+                    end: data.endTime,
+                    backgroundColor: "#06adef",
+                    textColor: "#ffffff",
+                    borderColor: "#06adef",
+                    url: "/free-slot-details/" + data.id
+                };
+                calendar.addEvent(event);
+                startTimeInput.value = "";
+                endTimeInput.value = "";
+                toastr.info(errorSpan.getAttribute('data-slot-added-success'));
+            } else {
+                toastr.error(errorSpan.getAttribute('slot-error'));
+                console.error(`API request failed with status code: ${response.status}`);
+            }
+        }
+    });
+</script>

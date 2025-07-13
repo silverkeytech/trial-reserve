@@ -1,0 +1,75 @@
+﻿@page "/reserve-event/{id}"
+@model Reserve.Pages.Event.ReserveEventModel
+@using Microsoft.Extensions.Localization
+@using Reserve.Core.Features.Event
+@using Reserve.Core
+@inject IStringLocalizer<EventLocalization> eL
+@inject IStringLocalizer<Global> gL
+<h1 class="notification-title mb-lg-5">@gL["reserve-now"]</h1>
+<div class="d-flex flex-column justify-content-center align-items-center">
+    <div class="notification-border mb-lg-5">
+        <h2 class="font-event-details d-flex justify-content-center mb-lg-5">@Model.Event!.Title</h2>
+        <form method="post" onsubmit="onSubmit(event)" class="p-3">
+            <span asp-validation-for="Ticket.CasualEvent" class="text-danger"></span>
+            <div class="d-flex flex-column">
+                <div class="d-flex justify-content-evenly">
+                    <div class="col-3">
+                        <label asp-for="Ticket.ReserverName" class="form-label">@gL["name"]</label>
+                    </div>
+                    <input type="text" asp-for="Ticket.ReserverName" name="Ticket.ReserverName" class="form-control w-50" placeholder="@gL["enter-your-name"]" />
+                </div>
+                <span asp-validation-for="Ticket.ReserverName" class="text-danger d-flex justify-content-center p-3"></span>
+            </div>
+            <div class="d-flex flex-column">
+                <div class="d-flex justify-content-evenly">
+                    <div class="col-3">
+                        <label asp-for="Ticket.ReserverEmail" class="form-label">@gL["email-address"]</label>
+                    </div>
+                    <input type="text" asp-for="Ticket.ReserverEmail" name="Ticket.ReserverEmail" class="form-control w-50" placeholder="@gL["enter-email-address"]" />
+                </div>
+                <span asp-validation-for="Ticket.ReserverEmail" class="text-danger d-flex justify-content-center p-3"></span>
+            </div>
+            <div class="d-flex flex-column">
+                <div class="d-flex justify-content-evenly">
+                    <div class="col-3">
+                        <label asp-for="Ticket.ReserverPhoneNumber" class="form-label">@gL["phone-number"]</label>
+                    </div>
+                    <input type="text" asp-for="Ticket.ReserverPhoneNumber" name="Ticket.ReserverPhoneNumber" class="form-control w-50" id="phoneNumberInput" placeholder="@gL["enter-phone-number"]" />
+                </div>
+                <span asp-validation-for="Ticket.ReserverPhoneNumber" class="text-danger d-flex justify-content-center p-3 mb-3"></span>
+            </div>
+            <input type="hidden" asp-for="ReCaptchaToken" id="recaptchaTokenInputId" />
+            <div class="d-flex justify-content-center mt-3">
+                <div id="html_element"></div>
+            </div>
+            <div class="d-flex justify-content-center">
+                <span asp-validation-for="ReCaptchaToken" class="text-danger text-center"></span>
+            </div>
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-custom reserve-blue-button col-md-2 col-12">@gL["reserve-now"]</button>
+            </div>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        document.getElementById('phoneNumberInput').addEventListener('input', function (e) {
+            var value = e.target.value;
+            e.target.value = value.replace(/[^0-9+]/g, '');
+        });
+    </script>
+    <script type="text/javascript">
+        var onloadCallback = function () {
+            grecaptcha.render('html_element', {
+                'sitekey': '@Model.ReCaptchaSiteKey'
+            });
+        };
+        function onSubmit(e) {
+            e.preventDefault();
+            var token = grecaptcha.getResponse();
+            document.getElementById('recaptchaTokenInputId').value = token;
+            e.target.submit();
+        }
+    </script>
+}

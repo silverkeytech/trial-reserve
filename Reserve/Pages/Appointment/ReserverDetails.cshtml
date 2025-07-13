@@ -1,0 +1,88 @@
+﻿@page "/appointee-details/{id}"
+@model Reserve.Pages.Appointment.ReserverDetailsModel
+@using Microsoft.Extensions.Localization
+@using Reserve.Core.Features.Appointment
+@using Reserve.Core
+@inject IStringLocalizer<AppointmentLocalization> aL
+@inject IStringLocalizer<Global> gL
+<div class="container mt-5">
+    <h1 class="display-4 text-center">@gL["reserve-now"]</h1>
+
+    <div class="d-flex justify-content-center">
+        <div class="card border rounded mt-4 col-8">
+            <div class="card-body text-center">
+                <h2 class="font-appointment-details d-flex justify-content-center mb-lg-5">
+                    @aL["appointment-with"] @Model.AvailabilitySlot?.AppointmentCalendar?.Name
+                </h2>
+                <div class="d-flex flex-column align-items-center">
+                    <h3 class="reserve-appointment">
+                        @aL["start-time"] @Model.AvailabilitySlot?.StartTime.ToLongDateString() @Model.AvailabilitySlot?.StartTime.ToShortTimeString()
+                    </h3>
+                    <h3 class="reserve-appointment">
+                        @aL["end-time"] @Model.AvailabilitySlot?.EndTime.ToLongDateString() @Model.AvailabilitySlot?.EndTime.ToShortTimeString()
+                    </h3>
+                </div>
+                <form method="post" onsubmit="onSubmit(event)" class="p-3">
+                    <span asp-validation-for="Appointment!.Slot!.Available" class="text-danger d-flex justify-content-center mb-lg-5"></span>
+                    <div class="d-flex flex-column">
+                        <div class="d-flex appointer-details justify-content-evenly">
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label asp-for="Appointment!.ReserverName" class="form-label">@gL["your-name"]</label>
+                            </div>
+                            <input type="text" asp-for="Appointment!.ReserverName" name="Appointment.ReserverName" class="input-appointer-details form-control w-50" />
+                        </div>
+                        <span asp-validation-for="Appointment!.ReserverName" class="text-danger d-flex justify-content-center p-3"></span>
+                    </div>
+                    <div class="d-flex flex-column">
+                        <div class="d-flex appointer-details justify-content-evenly">
+                            <div class="col-3">
+                                <label asp-for="Appointment!.ReserverEmail" class="form-label">@gL["email"]</label>
+                            </div>
+                            <input type="text" asp-for="Appointment!.ReserverEmail" name="Appointment.ReserverEmail" class="input-appointer-details form-control w-50" />
+                        </div>
+                        <span asp-validation-for="Appointment!.ReserverEmail" class="text-danger d-flex justify-content-center p-3"></span>
+                    </div>
+                    <div class="d-flex flex-column">
+                        <div class="d-flex appointer-details justify-content-evenly">
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label asp-for="Appointment!.ReserverPhoneNumber" class="form-label">@gL["phone-number"]</label>
+                            </div>
+                            <input type="text" asp-for="Appointment!.ReserverPhoneNumber" name="Appointment.ReserverPhoneNumber" class="input-appointer-details form-control w-50" id="phoneNumberInput" />
+                        </div>
+                        <span asp-validation-for="Appointment!.ReserverPhoneNumber" class="text-danger d-flex justify-content-center p-3 mb-3"></span>
+                    </div>
+                    <input type="hidden" asp-for="ReCaptchaToken" id="recaptchaTokenInputId" />
+                    <div class="d-flex justify-content-center mt-3">
+                        <div id="html_element"></div>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <span asp-validation-for="ReCaptchaToken" class="text-danger text-center"></span>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" class="btn btn-custom reserve-blue-button col-md-2 col-12">@gL["reserve-now"]</button>
+                    </div>
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        document.getElementById('phoneNumberInput').addEventListener('input', function (e) {
+            var value = e.target.value;
+            e.target.value = value.replace(/[^0-9+]/g, '');
+        });
+        var onloadCallback = function () {
+            grecaptcha.render('html_element', {
+                'sitekey': '@Model.ReCaptchaSiteKey'
+            });
+        };
+        function onSubmit(e) {
+            e.preventDefault();
+            var token = grecaptcha.getResponse();
+            document.getElementById('recaptchaTokenInputId').value = token;
+            e.target.submit();
+        }
+    </script>
+}

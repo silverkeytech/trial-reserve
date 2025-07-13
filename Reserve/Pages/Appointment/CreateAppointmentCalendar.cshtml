@@ -1,0 +1,66 @@
+@page "/create-appointment-calendar"
+@model Reserve.Pages.Appointment.CreateAppointmentCalendarModel
+@using Microsoft.Extensions.Localization
+@using Reserve.Core.Features.Appointment
+@using Reserve.Core
+@inject IStringLocalizer<AppointmentLocalization> appointmentL
+@inject IStringLocalizer<Global> GlobalL
+
+<h1 class="display-4 text-center">@appointmentL["create-your-appointments"]</h1>
+<div class="create-calendar-form col-md-12 d-flex flex-column align-items-center mt-3">
+    <div class="notification-border col-md-12 mb-lg-5">
+        <form method="post" onsubmit="onSubmit(event)" class="p-3">
+            <div class="d-flex flex-column">
+                <div class="d-flex appointer-details justify-content-evenly">
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <label asp-for="NewAppointmentCalendar!.Name" class="form-label">@GlobalL["name"]</label>
+                    </div>
+                    <input type="text" id="name" asp-for="NewAppointmentCalendar!.Name" name="NewAppointmentCalendar.Name" class="form-control w-50 input-appointer-details" placeholder="@GlobalL["enter-your-name"]" />
+                </div>
+                <span asp-validation-for="NewAppointmentCalendar!.Name" class="text-danger d-flex justify-content-center p-3"></span>
+            </div>
+            <div class="d-flex flex-column">
+                <div class="d-flex appointer-details justify-content-evenly">
+                    <div class="col-3">
+                        <label asp-for="NewAppointmentCalendar!.Email" class="form-label">@GlobalL["email-address"]</label>
+                    </div>
+                    <input type="text" id="email" asp-for="NewAppointmentCalendar!.Email" name="NewAppointmentCalendar.Email" class="input-appointer-details form-control w-50" placeholder="@GlobalL["enter-email-address"]" />
+                </div>
+                <span asp-validation-for="NewAppointmentCalendar!.Email" class="text-danger d-flex justify-content-center p-3"></span>
+            </div>
+            <div class="d-flex flex-column">
+                <div class="d-flex appointer-details justify-content-evenly">
+                    <div class="col-3">
+                        <label asp-for="NewAppointmentCalendar!.Description" class="form-label">@GlobalL["description"]</label>
+                    </div>
+                    <textarea type="text" id="description" asp-for="NewAppointmentCalendar!.Description" name="NewAppointmentCalendar.Description" class="input-appointer-details form-control w-50" placeholder="@GlobalL["enter-description"]"></textarea>
+                </div>
+                <span asp-validation-for="NewAppointmentCalendar!.Description" class="text-danger d-flex justify-content-center p-3 mb-3"></span>
+            </div>
+            <input type="hidden" asp-for="ReCaptchaToken" id="recaptchaTokenInputId" />
+            <div class="d-flex justify-content-center mt-3">
+                <div id="html_element"></div>
+            </div>
+            <div class="d-flex justify-content-center">
+                <span asp-validation-for="ReCaptchaToken" class="text-danger text-center"></span>
+            </div>
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-custom reserve-blue-button">@GlobalL["continue"]</button>
+            </div>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    var onloadCallback = function () {
+        grecaptcha.render('html_element', {
+            'sitekey': '@Model.ReCaptchaSiteKey'
+        });
+    };
+    function onSubmit(e) {
+        e.preventDefault();
+        var token = grecaptcha.getResponse();
+        document.getElementById('recaptchaTokenInputId').value = token;
+        e.target.submit();
+    }
+</script>

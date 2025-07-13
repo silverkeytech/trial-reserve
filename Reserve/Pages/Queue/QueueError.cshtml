@@ -1,0 +1,8 @@
+﻿@page "/queue-error"
+@using Microsoft.Extensions.Localization
+@using Reserve.Core
+@inject IStringLocalizer<Global> gL
+@model Reserve.Pages.Queue.QueueErrorModel
+<div class="alert alert-danger" role="alert">
+    @gL["error-message"]
+</div>

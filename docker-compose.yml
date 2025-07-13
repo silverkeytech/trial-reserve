@@ -1,0 +1,42 @@
+version: '3.9'
+
+services:
+  reserve_web:
+    build: .
+    container_name: reserve_web_prod
+    ports:
+      - 8060:80
+    environment:
+      - ASPNETCORE_ENVIRONMENT=deployment_prod
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - EDGEDB_DSN=edgedb://reserve_edgedb:5656?tls_security=insecure
+    volumes:
+      - ReserveDataProtection-Keys:/root/.aspnet/DataProtection-Keys
+
+    networks:
+      - reserve_edgedb_network
+      - nginx_reverse_proxy
+      
+  reserve_edgedb:
+    image: edgedb/edgedb
+    container_name: reserve_edgedb
+    environment:
+      - EDGEDB_SERVER_SECURITY=insecure_dev_mode
+      - EDGEDB_SERVER_ADMIN_UI=enabled
+      - EDGEDB_SERVER_BIND_ADDRESS=0.0.0.0
+    restart: always
+    volumes:
+      - reserve_dbdata:/var/lib/edgedb/data # Data persistence
+      - "./database/dbschema:/dbschema"
+    networks:
+      - reserve_edgedb_network
+
+volumes:
+  reserve_dbdata:
+  ReserveDataProtection-Keys:
+
+networks:
+  reserve_edgedb_network:
+    driver: bridge
+  nginx_reverse_proxy:
+    external: true

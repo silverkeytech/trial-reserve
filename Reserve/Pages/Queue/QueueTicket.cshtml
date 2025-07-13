@@ -1,0 +1,17 @@
+﻿@page "/q-ticket/{QueueTicketId}/{QueueId}"
+@model Reserve.Pages.Queue.QueueTicketModel
+
+<div hx-get="/q-ticket/@Model.QueueTicketId/@Model.QueueId?handler=RenderTicket"
+	 hx-target="this" 
+	 hx-trigger="load, every 5s" 
+	 hx-swap="innerHTML">
+</div>
+<form method="post">
+	<input type="hidden" asp-for="FcmToken" id="fcmToken" name="FcmToken" />
+</form>
+
+<script>
+	window.onload = function () {
+		document.getElementById('fcmTokenForm').submit();
+	};
+</script>

@@ -1,0 +1,70 @@
+﻿@page "/attendees/{id}"
+@model Reserve.Pages.Event.ViewAttendeesModel
+@using Microsoft.Extensions.Localization
+@using Reserve.Core.Features.Event
+@using Reserve.Core
+@inject IStringLocalizer<EventLocalization> eL
+@inject IStringLocalizer<Global> gL
+@Html.AntiForgeryToken()
+
+<div class="modal fade" id="closeReservation" tabindex="-1" aria-labelledby="closeReservationLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="d-flex flex-column align-items-center m-3">
+                <h1 class="modal-title fs-5 notification-title d-flex justify-content-center m-3" id="closeReservationLabel">@eL["modal-close-reservation-title"]</h1>
+                <div class="notification-border d-flex justify-content-center">
+                    <p class="notification-text p-3">@eL["modal-close-reservation-message"]</p>
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-around border-0">
+                <button type="button" hx-post="/close-reservation/@Model.Id" hx-headers='js:{"X-CSRF-TOKEN": document.getElementsByName("__RequestVerificationToken")[0].value}' hx-target="#reservation" class="btn reserve-red-button" data-bs-dismiss="modal">@gL["yes"]</button>
+                <button type="button" data-bs-dismiss="modal" class="btn reserve-blue-button">@gL["no"]</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-around">
+    <h1 class="event-title d-flex justify-content-center mb-lg-5 me-lg-auto">@eL["attendees-list-title"]</h1>
+    <div class="d-flex justify-content-end" id="reservation">
+        @if (Model.Event?.Opened is true)
+        {
+            <button class="btn reserve-red-button" style="height:40px!important;" type="button" data-bs-toggle="modal" data-bs-target="#closeReservation">@eL["reservation-end-reservation-button"]</button>
+        }
+        else
+        {
+            <p class="notification-text m-3">@eL["reservation-closed-message"]</p>
+        }
+    </div>
+</div>
+<div class="d-flex justify-content-between mb-lg-5 event-buttons">
+    <h2 class="notification-title m-3">@Model.Event!.Title</h2>
+    <h3 class="notification-title m-3">@gL["location"]: @Model.Event.Location</h3>
+    <div class="d-flex w-25 justify-content-end">
+        <a href="@Url.Page("EditEvent", new {id = Model.Id})" style="height:40px!important;" class="btn col-12 col-md-4 d-flex align-items-center justify-content-center reserve-blue-button m-3 attendees-button">@eL["attendees-edit-event-button"]</a>
+    </div>
+</div>
+<table class="table">
+    <thead class="table-light">
+        <tr class="notification-text">
+            <th scope="col">#</th>
+            <th scope="col">@gL["name"]</th>
+            <th scope="col">@gL["email"]</th>
+            <th scope="col">@gL["phone-number"]</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 0; i < Model.Attendees.Count; i++)
+        {
+            <tr class="notification-text box-shadow shadow-sm">
+                <td>@(i + 1)</td>
+                <td>@Model.Attendees[i]!.ReserverName</td>
+                <td>@Model.Attendees[i]!.ReserverEmail</td>
+                <td>@Model.Attendees[i]!.ReserverPhoneNumber</td>
+            </tr>
+        }
+    </tbody>
+</table>

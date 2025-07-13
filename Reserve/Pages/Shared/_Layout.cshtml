@@ -1,0 +1,128 @@
+﻿@using System.Globalization
+<!DOCTYPE html>
+<html lang="en" dir="@GetTextDirection()">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Reserve</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Reserve.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/navbar.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/event.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/eventdetails.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css" />
+    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#007bff">
+    <script src="https://www.gstatic.com/firebasejs/9.9.0/firebase-app.js" type="module"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.9.0/firebase-messaging.js" type="module"></script>
+
+
+    <base href="~/" />
+    <component type="typeof(Microsoft.AspNetCore.Components.Web.HeadOutlet)"
+               render-mode="ServerPrerendered" />
+</head>
+
+<body>
+    <header>
+        @(await Html.RenderComponentAsync<Navbar>(RenderMode.Static))
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2024 - Reserve - <a asp-area="" asp-page="/Privacy">Privacy</a>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://unpkg.com/htmx.org@2.0.1" integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/" crossorigin="anonymous"></script>
+    <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit"
+            async defer>
+    </script>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.9.0/firebase-app.js';
+        import { getMessaging, getToken, onMessage } from 'https://www.gstatic.com/firebasejs/9.9.0/firebase-messaging.js';
+
+
+        document.addEventListener('DOMContentLoaded', async function () {
+            const firebaseConfig = {
+                apiKey: "AIzaSyCYp9ZVNexzuelfKJJbqXtgXykllY0T0T0",
+                authDomain: "reserve-a452c.firebaseapp.com",
+                projectId: "reserve-a452c",
+                storageBucket: "reserve-a452c.appspot.com",
+                messagingSenderId: "700503073311",
+                appId: "1:700503073311:web:73df40335ffc75f7eeab2a"
+            };
+
+            const app = initializeApp(firebaseConfig);
+            const messaging = getMessaging(app);
+
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    console.log("Notification permission granted.");
+
+                    navigator.serviceWorker.register('/firebase-messaging-sw.js')
+                        .then((registration) => {
+                            return getToken(messaging, {
+                                vapidKey: 'BK6pYm4DqazJ8Kr19JeX3NgE7Z_cLHCPSI8fWYdnWoGZMlbFQpF5LizypwKXtsI9Fswyou0mwX0WCAXAtE3kRyU', serviceWorkerRegistration: registration });
+
+                        })
+                        .then((currentToken) => {
+                            if (currentToken) {
+                                console.log('FCM Token:', currentToken);
+
+                                const fcmTokenInput = document.querySelector('input[name="FcmToken"]');
+                                if (fcmTokenInput) {
+                                    fcmTokenInput.value = currentToken;
+                                }
+
+                            } else {
+                                console.log('No registration token available. Request permission to generate one.');
+                            }
+                        })
+                        .catch((err) => {
+                            console.log('An error occurred while retrieving token. ', err);
+                        });
+                } else {
+                    console.log('Unable to get permission to notify.');
+                }
+            } catch (err) {
+                console.log('An error occurred while retrieving token. ', err);
+            }
+
+            onMessage(messaging, (payload) => {
+                console.log('Message received. ', payload);
+            });
+        });
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then((registration) => {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                })
+                .catch((error) => {
+                    console.log('ServiceWorker registration failed: ', error);
+                });
+        }
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+
+@functions {
+    private string GetTextDirection()
+    {
+        var culture = CultureInfo.CurrentCulture.Name;
+        return culture == "ar" ? "rtl" : "ltr";
+    }
+}

@@ -1,0 +1,30 @@
+﻿@page "/meeting-notification/{id}"
+@model Reserve.Pages.Appointment.MeetingNotificationModel
+@using Microsoft.Extensions.Localization
+@using Reserve.Core.Features.Appointment
+@using Reserve.Core
+@inject IStringLocalizer<AppointmentLocalization> aL
+@inject IStringLocalizer<Global> gL
+<div class="container mt-5">
+    <h1 class="display-4 text-center">@aL["appointment-reserved"]</h1>
+
+    <div class="d-flex justify-content-center">
+        <div class="card border rounded mt-4 col-8">
+            <div class="card-body text-center">
+                <p class="card-text" style="font-size: 1.25rem;">
+                    @aL["reservation-success"]
+                </p>
+                <p class="card-text" style="font-size: 1.25rem;">
+                    @aL["view-details"]
+                    <a class="d-flex justify-content-center" href="@Url.Page("UserAppointmentDashboard", new { id = Model.Id })">
+                        @gL["link"]
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="/" class="reserve-blue-button btn btn-custom">@gL["home-page"]</a>
+    </div>
+</div>

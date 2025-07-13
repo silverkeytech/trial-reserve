@@ -1,0 +1,42 @@
+version: '3.9'
+
+services:
+  reserve_web:
+    build: .
+    container_name: reserve_web_test
+    ports:
+      - 8080:80
+    environment:
+      - ASPNETCORE_ENVIRONMENT=deployment_test
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - EDGEDB_DSN=edgedb://reserve_edgedb_test:5656?tls_security=insecure
+    volumes:
+      - ReserveDataProtectionTest-Keys:/root/.aspnet/DataProtection-Keys
+
+    networks:
+      - reserve_edgedb_network_test
+      - nginx_reverse_proxy
+      
+  reserve_edgedb:
+    image: edgedb/edgedb
+    container_name: reserve_edgedb_test
+    environment:
+      - EDGEDB_SERVER_SECURITY=insecure_dev_mode
+      - EDGEDB_SERVER_ADMIN_UI=enabled
+      - EDGEDB_SERVER_BIND_ADDRESS=0.0.0.0
+    restart: always
+    volumes:
+      - reserve_dbdata_test:/var/lib/edgedb/data # Data persistence
+      - "./database/dbschema:/dbschema"
+    networks:
+      - reserve_edgedb_network_test
+
+volumes:
+  reserve_dbdata_test:
+  ReserveDataProtectionTest-Keys:
+
+networks:
+  reserve_edgedb_network_test:
+    driver: bridge
+  nginx_reverse_proxy:
+    external: true

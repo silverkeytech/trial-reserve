@@ -1,0 +1,47 @@
+﻿@using System.Globalization
+@using Microsoft.Extensions.Localization
+@using Reserve.Core
+@inject IStringLocalizer<Global> gL
+<nav class="navbar-bg navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+    <div class="container">
+        <a href="/" class="nav-title navbar-brand" asp-area="" asp-page="/">Reserve</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+            <ul class="navbar-nav flex-grow-1 justify-content-end">
+                <li class="nav-item">
+                    <a href="/create-event" class="reserve-blue-button-link justify-content-center nav-link text-dark" asp-area="">@gL["create-event"]</a>
+                </li>
+                <li class="nav-item">
+                    <a href="./create-q" class="reserve-blue-button-link justify-content-center nav-link text-dark" asp-area="">@gL["create-queue"]</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/create-appointment-calendar" class="reserve-blue-button-link justify-content-center nav-link text-dark" asp-area="">@gL["create-appointment"]</a>
+                </li>
+                <li class="nav-item">
+                    <a id="cultureSwitchLink" class="reserve-blue-button-link justify-content-center nav-link text-dark" asp-area="">
+                        @if (CultureInfo.CurrentCulture.Name == "ar")
+                        {
+                            <span>en - انجليزي</span>
+                        }
+                        else
+                        {
+                            <span>عربي - ar</span>
+                        }
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var currentCulture = '@CultureInfo.CurrentCulture.Name';
+        var switchCulture = currentCulture === 'ar' ? 'en' : 'ar';
+        var currentUrl = window.location.pathname + window.location.search;
+        var switchLink = document.getElementById('cultureSwitchLink');
+        switchLink.href = `/switch?culture=${switchCulture}&redirectUrl=${encodeURIComponent(currentUrl)}`;
+    });
+</script>

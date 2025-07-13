@@ -1,0 +1,32 @@
+﻿@page "/q-url/{id}"
+@model Reserve.Pages.Queue.QueueURLModel
+@using Microsoft.Extensions.Localization
+@using Reserve.Core.Features.Queue
+@using Reserve.Core
+@inject IStringLocalizer<QueueLocalization> qL
+@inject IStringLocalizer<Global> gL
+<div class="container mt-5">
+    <h1 class="display-4 text-center">@qL["queue-created-successfully"]</h1>
+
+    <div class="d-flex justify-content-center">
+        <div class="card border rounded mt-4 col-8">
+            <div class="card-body text-center">
+                <p class="card-text" style="font-size: 1.25rem;">@qL["share-your-queue"]</p>
+                <p class="card-text" style="font-size: 1.25rem;">
+                    <a href="@Url.Page("QueueRegistration", new {id = Model.ForURL})">
+                        www.reserve.com/QueueRegistration/@Model.ForURL
+                    </a>
+                </p>
+                <p class="card-text" style="font-size: 1.25rem;">@qL["edit-queue-info"]</p>
+                <p class="card-text" style="font-size: 1.25rem;">
+                    <a href="@Url.Page("QueueAdmin", new { id = Model.ForURL })">www.reserve.com/QueueAdmin/@Model.ForURL</a>
+                </p>
+                <p class="card-text" style="font-size: 1.25rem;">@qL["email-sent"]</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="/" class="reserve-blue-button btn btn-custom">@qL["home-page"]</a>
+    </div>
+</div>

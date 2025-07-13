@@ -1,0 +1,67 @@
+﻿@page "/create-q"
+@model Reserve.Pages.Queue.CreateQueueModel
+@using Microsoft.Extensions.Localization
+@using Reserve.Core.Features.Queue
+@using Reserve.Core
+@inject IStringLocalizer<QueueLocalization> qL
+@inject IStringLocalizer<Global> gL
+<h1 class="display-4 text-center">@qL["create-queue-title"]</h1>
+<div class="create-calendar-form col-md-12 d-flex flex-column align-items-center mt-3">
+    <div class="notification-border col-md-12 mb-lg-5">
+        <form method="post" onsubmit="onSubmit(event)" class="p-3">
+
+            <div class="d-flex flex-column">
+                <div class="d-flex appointer-details justify-content-evenly">
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <label asp-for="NewQueue!.Title" class="form-label">@qL["queue-name-label"]</label>
+                    </div>
+                    <input type="text" asp-for="NewQueue!.Title" name="Title" class="form-control w-50 input-appointer-details" placeholder="@qL["queue-name-placeholder"]" />
+                </div>
+                <span asp-validation-for="NewQueue!.Title" class="text-danger d-flex justify-content-center p-3"></span>
+            </div>
+            <div class="d-flex flex-column">
+                <div class="d-flex appointer-details justify-content-evenly">
+                    <div class="col-3">
+                        <label asp-for="NewQueue!.OrganizerEmail" class="form-label">@gL["email-address"]</label>
+                    </div>
+                    <input type="email" asp-for="NewQueue!.OrganizerEmail" name="OrganizerEmail" class="input-appointer-details form-control w-50" placeholder="@gL["enter-email-address"]" />
+                </div>
+                <span asp-validation-for="NewQueue!.OrganizerEmail" class="text-danger d-flex justify-content-center p-3"></span>
+            </div>
+            <div class="d-flex flex-column">
+                <div class="d-flex appointer-details justify-content-evenly">
+                    <div class="col-3">
+                        <label asp-for="NewQueue!.Description" class="form-label">@gL["description"]</label>
+                    </div>
+                    <textarea asp-for="NewQueue!.Description" name="Description" class="input-appointer-details form-control w-50" placeholder="@gL["enter-description"]"></textarea>
+                </div>
+                <span asp-validation-for="NewQueue!.Description" class="text-danger d-flex justify-content-center p-3 mb-3"></span>
+            </div>
+            <input type="hidden" asp-for="ReCaptchaToken" id="recaptchaTokenInputId" />
+            <div class="d-flex justify-content-center mt-3">
+                <div id="html_element"></div>
+            </div>
+            <div class="d-flex justify-content-center">
+                <span asp-validation-for="ReCaptchaToken" class="text-danger text-center"></span>
+            </div>
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-custom reserve-blue-button">@qL["create-button"]</button>
+            </div>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var onloadCallback = function() {
+        grecaptcha.render('html_element', {
+            'sitekey': '@Model.ReCaptchaSiteKey'
+        });
+    };
+    function onSubmit(e) {
+        e.preventDefault();
+		var token = grecaptcha.getResponse();
+        document.getElementById('recaptchaTokenInputId').value=token;
+        e.target.submit();
+	}
+</script>

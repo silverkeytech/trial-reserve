@@ -1,0 +1,27 @@
+﻿@page "/reservation-notification/{id}"
+@model Reserve.Pages.Event.ReservationNotificationModel
+@using Microsoft.Extensions.Localization
+@using Reserve.Core.Features.Event
+@using Reserve.Core
+@inject IStringLocalizer<EventLocalization> eL
+@inject IStringLocalizer<Global> gL
+<h1 class="notification-title mb-lg-5">@eL["reservation-successful-title"]</h1>
+<div class="d-flex flex-column justify-content-center align-items-center">
+    <div class="notification-border mb-lg-5">
+        <div>
+            <p class="notification-text d-flex justify-content-center mb-1">
+                @eL["reservation-successful-message"]&nbsp;
+            </p>
+        </div>
+        <div>
+            <p class="notification-text d-flex justify-content-center mb-1">
+                 <a href="@Url.Page("ReserverDetails", new { id = Model.Id })">www.reserve.com/reserver-details/@Model.Id</a>.
+             </p>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center">
+        <a href="@Url.Page("ReserverDetails", new { id = Model.Id })" class="btn btn-custom reserve-blue-button">
+            @eL["your-details-button"]
+        </a>
+    </div>
+</div>

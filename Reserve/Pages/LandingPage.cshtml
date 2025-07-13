@@ -1,0 +1,48 @@
+﻿@page "/"
+@model LandingPageModel
+@using Microsoft.Extensions.Localization
+@using Reserve.Core
+@inject IStringLocalizer<Global> gL
+@{
+    ViewData["Title"] = "Home page";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home Page</title>
+    <style>
+        .body-image {
+            background-size: cover !important;
+            background-repeat: no-repeat !important;
+            background-attachment: fixed !important;
+        }
+    </style>
+</head>
+<body class="body-image" background="\images\background.jpg">
+    <div class="main-content">
+        <h1>@gL["secure-appointments-heading-part1"]<br /><span class="highlight">@gL["secure-appointments-heading-part2"]</span></h1>
+        <p>@gL["reservation-description"]</p>
+        <br />
+        <br />
+        <div class="row">
+            <div class="col-md-4">
+                <h3 class="highlight">@gL["create-event-heading"]</h3>
+                <p>@gL["create-event-description"]</p>
+            </div>
+            <div class="col-md-4">
+                <h3 class="highlight">@gL["create-queue-heading"]</h3>
+                <p>@gL["create-queue-description"]</p>
+            </div>
+            <div class="col-md-4">
+                <h3 class="highlight">@gL["create-appointment-heading"]</h3>
+                <p>@gL["create-appointment-description"]</p>
+            </div>
+        </div>
+        <div class="mt-5">
+            <a href="@Url.Page("Event/CreateEvent")" class="btn btn-custom reserve-blue-button">@gL["create-event"]</a>
+            <a href="/create-q" class="btn btn-custom mx-3 reserve-blue-button">@gL["create-queue"]</a>
+            <a href="/create-appointment-calendar" class="btn btn-custom reserve-blue-button">@gL["create-appointment"]</a>
+        </div>
+    </div>
+</body>
+</html>

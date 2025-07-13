@@ -1,0 +1,33 @@
+﻿@page "/calendar-creation-notification/{id}"
+@model Reserve.Pages.Appointment.CalendarNotificationModel
+@using Microsoft.Extensions.Localization
+@using Reserve.Core.Features.Appointment
+@using Reserve.Core
+@inject IStringLocalizer<AppointmentLocalization> aL
+@inject IStringLocalizer<Global> gL
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+<div class="container mt-5">
+    <h1 class="display-4 text-center">@aL["calendar-created"]</h1>
+
+    <div class="d-flex justify-content-center">
+        <div class="card border rounded mt-4 col-8">
+            <div class="card-body text-center">
+                <p class="card-text" style="font-size: 1.25rem;">@aL["share-calendar"]</p>
+                <p class="card-text" style="font-size: 1.25rem;">
+                    <a href="@($"{HttpContextAccessor.HttpContext!.Request.Scheme}://{HttpContextAccessor.HttpContext.Request.Host}/reserve-appointment/{Model.Id}")">
+                        @($"{HttpContextAccessor.HttpContext.Request.Scheme}://{HttpContextAccessor.HttpContext.Request.Host}/reserve-appointment/{Model.Id}")
+                    </a>
+                </p>
+                <p class="card-text" style="font-size: 1.25rem;">@aL["view-appointments-link"]</p>
+                <p class="card-text" style="font-size: 1.25rem;">
+                    <a href="@Url.Page("UpcomingAppointments", new { id = Model.Id })">www.reserve.com/UpcomingAppointments/@Model.Id</a>
+                </p>
+                <p class="card-text" style="font-size: 1.25rem;">@gL["email-sent"]</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="/" class="reserve-blue-button btn btn-custom">@gL["home-page"]</a>
+    </div>
+</div>

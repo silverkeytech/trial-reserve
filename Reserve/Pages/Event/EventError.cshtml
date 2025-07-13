@@ -1,0 +1,8 @@
+﻿@page "/event-error"
+@model Reserve.Pages.Event.EventErrorModel
+@using Microsoft.Extensions.Localization
+@using Reserve.Core
+@inject IStringLocalizer<Global> L
+<div class="alert alert-danger" role="alert">
+    @L["error-message"]
+</div>
