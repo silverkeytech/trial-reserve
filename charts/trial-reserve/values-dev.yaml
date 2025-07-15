@@ -2,4 +2,4 @@ replicaCount: 1
 image:
   repository: registry.arc-center.run/silverkeytech/trial-reserve
   pullPolicy: IfNotPresent
-  tag: trial-reserve-dev-latest
+  tag: 7237eb
